@@ -1,0 +1,84 @@
+# FOL Visualiser Demo
+
+## Section
+
+This LiveBook demonstrates the First-Order Logic (FOL) Tableau Prover with visualization capabilities.
+
+## Setup
+
+First, let's compile and load the FOL Visualiser module:
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.12.0"}
+])
+```
+
+```elixir
+# Compile the modules using relative paths
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/structs.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/term.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/unification_adapter.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/unification.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/fol.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/parser.ex")
+Code.compile_file("/Users/avinash/Desktop/FOL_Visualiser/lib/fol_visualiser/tree_visualizer.ex")
+
+# Import the main module
+alias FOLVisualiser
+```
+
+```elixir
+formula1 = "(A → B) → (¬B → ¬A)"
+FOLVisualiser.prove_and_visualize(formula1)
+```
+
+### Example 3: Disjunction
+
+Test a disjunction formula: `A ∨ B`
+
+```elixir
+formula3 = "A ∨ B"
+FOLVisualiser.prove_and_visualize(formula3)
+```
+
+### Example 4: Universal Quantification
+
+Test a universal quantification: `∀x:i. (P(x) → Q(x)) → (∀x:i. P(x) → ∀x:i. Q(x))`
+
+```elixir
+formula4 = "∀x:i. (P(x) → Q(x)) → (∀x:i. P(x) → ∀x:i. Q(x))"
+FOLVisualiser.prove_and_visualize(formula4)
+```
+
+### Example 5: Existential Quantification
+
+Test an existential quantification: `∃x:i. P(x) → ¬∀x:i. ¬P(x)`
+
+```elixir
+formula5 = "∃x:i. P(x) → ¬∀x:i. ¬P(x)"
+FOLVisualiser.prove_and_visualize(formula5)
+```
+
+### Example 6: Equality
+
+Test an equality formula: `∀x:i. ∀y:i. (x = y → y = x)`
+
+```elixir
+formula6 = "∀x:i. ∀y:i. (x = y → y = x)"
+FOLVisualiser.prove_and_visualize(formula6)
+```
+
+## Interactive Formula Input
+
+You can test your own formulas using the input field below:
+
+```elixir
+input = Kino.Input.text("FOL Formula", default: "(A → B) → (¬B → ¬A)")
+```
+
+```elixir
+custom_formula = Kino.Input.read(input)
+FOLVisualiser.prove_and_visualize(custom_formula)
+```
