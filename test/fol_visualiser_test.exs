@@ -2,8 +2,10 @@ defmodule FOLVisualiserTest do
   use ExUnit.Case
   doctest FOLVisualiser
 
+  # Alias Parser and FOL modules for testing
   alias FOLVisualiser.{Parser, FOL}
 
+  # Test parsing of simple implication
   test "parses simple implication" do
     assert {:ok, {:imp, {:const, :A, :o}, {:const, :B, :o}}} = 
            Parser.parse("A → B")

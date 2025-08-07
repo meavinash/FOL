@@ -3,34 +3,60 @@ defmodule FOLVisualiser.Term do
   Term operations for FOL expressions including substitution and free variable checking.
   """
 
+  # Alias for term structure definitions
   alias FOLVisualiser.Structs
 
   @doc """
   Substitute a variable with a replacement term in a given term.
   Handles alpha-conversion to avoid variable capture.
   """
-  def subst(term, var, replacement) do
-    case term do
-      {:var, v, _} when v == var -> replacement
-      {:var, _, _} -> term
-      {:const, _, _} -> term
-      {:app, t1, t2} ->
-        {:app, subst(t1, var, replacement), subst(t2, var, replacement)}
-      {:forall, bound_var, type, body} when bound_var != var ->
-        {:forall, bound_var, type, subst(body, var, replacement)}
-      {:forall, bound_var, type, body} when bound_var == var ->
-        {:forall, bound_var, type, body}
-      {:exists, bound_var, type, body} when bound_var != var ->
-        {:exists, bound_var, type, subst(body, var, replacement)}
-      {:exists, bound_var, type, body} when bound_var == var ->
-        {:exists, bound_var, type, body}
-      {:not, t} -> {:not, subst(t, var, replacement)}
-      {:and, t1, t2} -> {:and, subst(t1, var, replacement), subst(t2, var, replacement)}
-      {:or, t1, t2} -> {:or, subst(t1, var, replacement), subst(t2, var, replacement)}
-      {:imp, t1, t2} -> {:imp, subst(t1, var, replacement), subst(t2, var, replacement)}
-      {:equals, t1, t2} -> {:equals, subst(t1, var, replacement), subst(t2, var, replacement)}
-    end
+
+
+def subst(term, var, replacement) do
+  case term do
+    # Case 1: The 'term' itself IS the variable we want to replace.
+    {:var, v, _} when v == var ->
+      # Found it! Return the replacement.
+      replacement
+
+    # Case 2: It's a different variable or a constant. Nothing to do here.
+    {:var, _, _} -> term
+    {:const, _, _} -> term
+
+    # Case 3: It's a complex term (like P(x), A∧B, ¬C).
+    # We need to recursively apply 'subst' to its smaller parts.
+    {:app, t1, t2} ->
+      {:app, subst(t1, var, replacement), subst(t2, var, replacement)}
+    {:not, t} ->
+      {:not, subst(t, var, replacement)}
+    {:and, t1, t2} ->
+      {:and, subst(t1, var, replacement), subst(t2, var, replacement)}
+    {:or, t1, t2} ->
+      {:or, subst(t1, var, replacement), subst(t2, var, replacement)}
+    {:imp, t1, t2} ->
+      {:imp, subst(t1, var, replacement), subst(t2, var, replacement)}
+    {:equals, t1, t2} ->
+      {:equals, subst(t1, var, replacement), subst(t2, var, replacement)}
+
+    # Case 4: It's a universal quantifier (∀).
+    # If 'var' (the variable we're replacing) is DIFFERENT from 'bound_var' (the variable the quantifier is using),
+    # then we can safely substitute inside the 'body'.
+    {:forall, bound_var, type, body} when bound_var != var ->
+      {:forall, bound_var, type, subst(body, var, replacement)}
+
+    # If 'var' IS THE SAME as 'bound_var', then 'var' is "bound" by this quantifier.
+    # We DO NOT substitute inside the body to avoid changing the meaning.
+    {:forall, bound_var, type, body} when bound_var == var ->
+      {:forall, bound_var, type, body}
+
+    # Case 5: It's an existential quantifier (∃). Similar logic to :forall.
+    {:exists, bound_var, type, body} when bound_var != var ->
+      {:exists, bound_var, type, subst(body, var, replacement)}
+    {:exists, bound_var, type, body} when bound_var == var ->
+      {:exists, bound_var, type, body}
   end
+end
+
 
   @doc """
   Check if a variable occurs free in a term.

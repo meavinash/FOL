@@ -1,6 +1,7 @@
 defmodule FOLVisualiser.MixProject do
   use Mix.Project
 
+  # Configuration for the FOL Visualiser project
   def project do
     [
       app: :fol_visualiser,
@@ -11,27 +12,30 @@ defmodule FOLVisualiser.MixProject do
       name: "FOL Visualiser",
       description: "First-Order Logic Tableau Prover with Visualization",
       package: package(),
-      source_url: "https://github.com/yourusername/fol_visualiser",
-      homepage_url: "https://github.com/yourusername/fol_visualiser"
+      source_url: ".",
+      homepage_url: "."
     ]
   end
 
+  # Application configuration
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
+  # List of dependencies
   defp deps do
     [
       {:kino, "~> 0.12.0"}
     ]
   end
 
+  # Package information
   defp package do
     [
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/yourusername/fol_visualiser"}
+      links: %{ "GitHub" => "."}
     ]
   end
 end

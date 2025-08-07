@@ -2,12 +2,6 @@
 
 ## Section
 
-This LiveBook demonstrates the First-Order Logic (FOL) Tableau Prover with visualization capabilities.
-
-## Setup
-
-First, let's compile and load the FOL Visualiser module:
-
 ```elixir
 Mix.install([
   {:kino, "~> 0.12.0"}
@@ -41,6 +35,16 @@ Test a disjunction formula: `A ∨ B`
 ```elixir
 formula3 = "A ∨ B"
 FOLVisualiser.prove_and_visualize(formula3)
+```
+
+```elixir
+formula4 = "∀P. P(a)"
+FOLVisualiser.prove_and_visualize(formula4)
+
+
+#Quantifying over a predicate variable P (second-order logic) is not supported.
+#In FOL, quantifiers only apply to individual variables, not predicate or
+#function variables.
 ```
 
 ### Example 4: Universal Quantification

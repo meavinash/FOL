@@ -5,10 +5,11 @@ defmodule FOLVisualiser.FOL do
   Implements the semantic tableau method for automated theorem proving.
   """
 
+  # Aliases for FOL term structures, term operations, and unification logic
   alias FOLVisualiser.Structs
   alias FOLVisualiser.Term
-  alias FOLVisualiser.UnificationAdapter
-  alias FOLVisualiser.Unification
+  alias FOLVisualiser.UnificationAdapter    # To help with comparing terms
+  alias FOLVisualiser.Unification            # The actual unification system
 
   @max_steps 50
 
@@ -17,8 +18,15 @@ defmodule FOLVisualiser.FOL do
   Returns {result_map, detailed_steps_list}
   """
   def prove_with_detailed_steps(goal_term) do
+      # Step 1: Negate the original formula. We try to find a contradiction in its negation.
+ 
     negated_goal = negate_term(goal_term)
-    root = %Structs.TableauNode{
+    
+    # Step 2: Create the very first node of our proof tree (the "root").
+    # This node contains our initial assumption (the negated goal).
+
+    root = %Structs.TableauNode{           # Creating the very first TableauNode (the root of our proof tree)
+
       formulas: [negated_goal], 
       id: 0, 
       step: 0, 
@@ -28,17 +36,36 @@ defmodule FOLVisualiser.FOL do
       original_formula: goal_term,
       rule_description: "Negate goal for contradiction"
     }
+
+        # Step 3: Initialize the overall state of the tableau prover.
+
+
+    # Creating the overall TableauState to manage the proof
+
     state = %Structs.TableauState{
-      root: root, 
-      node_counter: 1, 
-      witness_counter: 0, 
-      steps: []
+      root: root,                # The state knows about the root node
+      node_counter: 1,           # Next ID will be 1
+      witness_counter: 0,
+      steps: []                  # No steps yet
     }
     
+        # Step 4: Start the recursive expansion of the tableau tree.
+
+
     {final_state, detailed_steps} = expand_tableau_with_correct_steps(state)
+
+  
+    # Step 5: After expansion, classify all nodes (open, closed, intermediate).
+
+    
     final_root = classify_all_nodes(final_state.root)
+
+        # Step 6: Collect all final leaf branches to determine overall validity.
+
     {closed, open} = collect_leaf_branches(final_root)
     
+        # Step 7: Prepare the final result.
+
     result = %{
       closed_branches: closed, 
       open_branches: open,
@@ -54,18 +81,34 @@ defmodule FOLVisualiser.FOL do
     expand_tableau_rec(state, 1, [])
   end
 
+  # This function drives the recursive expansion of the tableau.
+
   defp expand_tableau_rec(state, step_num, steps_acc) do
     cond do
+
+          # Safeguard: Stop if we've taken too many steps (prevents infinite loops).
+
       step_num > @max_steps -> 
         {state, Enum.reverse(steps_acc)}
-      
+       
+       # Find a node in the tree that still has formulas to expand.
+        # This function intelligently picks the next formula to work on.
+
       true ->
         case find_next_expandable_node(state.root) do
-          nil -> 
+          nil ->       # No more formulas to expand anywhere in the tree.
+
             {state, Enum.reverse(steps_acc)}
           
           {node, formula} ->
+
+          # Apply the appropriate tableau rule to the chosen formula.
+            # This is where the tree branches or extends.
+
             {new_state, step} = apply_rule_with_enhanced_tracking(formula, node, state, step_num)
+
+            # Recursively call itself to continue the expansion with the updated state.
+
             expand_tableau_rec(new_state, step_num + 1, [step | steps_acc])
         end
     end
@@ -367,7 +410,14 @@ defmodule FOLVisualiser.FOL do
   end
 
   defp find_direct_contradiction(formulas) do
+  # This function iterates through all pairs of formulas in a branch.
+    # It checks if one formula "matches" the negation of another.
+    # This often involves calling the [Unification System](06_unification_system_.md)
+    # to see if a formula like `P(x)` and `¬P(a)` could be contradictory if `x` can be `a`.
+    # ... simplified logic ...
     # Extract atomic formulas and their negations
+
+
     atomic_formulas = Enum.flat_map(formulas, fn 
       {:not, f} -> [{:negative, f}]
       f -> [{:positive, f}]
@@ -394,14 +444,20 @@ defmodule FOLVisualiser.FOL do
     end)
   end
 
+
+# This function checks if a list of formulas contains a contradiction.
+
   defp check_closure_comprehensive(formulas) do
+
+    # It looks for a formula and its negation (e.g., 'A' and '¬A')
+
     direct_contradiction = find_direct_contradiction(formulas)
     if direct_contradiction do
-      {true, direct_contradiction}
+      {true, direct_contradiction}       # Yes, a contradiction was found!
     else
-      {false, nil}
+      {false, nil}          # No contradiction here.
     end
-  end
+  end   
 
   defp terms_match?(t1, t2) do
     # Convert to unification format and check unification
@@ -414,11 +470,21 @@ defmodule FOLVisualiser.FOL do
     end
   end
 
+  # This function helps find the next formula to work on in the entire tree.
+
   defp find_next_expandable_node(node) do
+  #    # If the node is closed, we don't need to expand it further.
+
     cond do
       node.closed -> 
         nil
       
+    # If this node has formulas, find one to expand.
+    # ... logic to prioritize which formula to expand ...
+
+    # Otherwise, check its children.
+    # ... logic to recurse into children ...
+
       node.formulas != [] ->
         case Enum.find(node.formulas, &expandable_formula?/1) do
           nil -> 
@@ -554,6 +620,8 @@ defmodule FOLVisualiser.FOL do
       _ -> "#{inspect(result)}"
     end
   end
+
+  # Helper function to negate a term (e.g., A becomes ¬A, ¬A becomes A)
 
   defp negate_term(term) do
     case term do

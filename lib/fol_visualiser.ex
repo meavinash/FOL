@@ -8,6 +8,7 @@ defmodule FOLVisualiser do
   - Professional visualization of proof trees
   """
 
+  # Alias modules for parsing, proving, and visualizing FOL formulas
   alias FOLVisualiser.{Parser, FOL, TreeVisualizer}
 
   @doc """
@@ -20,14 +21,24 @@ defmodule FOLVisualiser do
   
   """
   def prove_and_visualize(formula_str) do
-    case Parser.parse(formula_str) do
-      {:ok, ast} ->
+      # Step 1: Send the formula string to the Parser to "understand" it.
+
+    case Parser.parse(formula_str) do # Calling the Formula Parser!
+      {:ok, ast} -> # If parsing is successful, we get an AST (Abstract Syntax Tree).
         {result, detailed_steps} = FOL.prove_with_detailed_steps(ast)
         
-        tree_html = TreeVisualizer.generate_tree_html(result.tree_root, formula_str)
+        # Step 2: Send the AST to the FOL module (our proving engine) to "prove" it.
+        {result, detailed_steps} = FOL.prove_with_detailed_steps(ast) # Calling the Tableau Proving Engine!
+
+        # Step 3: Send the proof results to the TreeVisualizer to create the visual tree.
+        tree_html = TreeVisualizer.generate_tree_html(result.tree_root, formula_str) # Calling the Tree Visualizer!
+
+        # Step 4: Generate other parts of the HTML report (summary, detailed steps).
         summary_html = generate_professional_proof_summary(formula_str, result, detailed_steps)
         steps_html = generate_professional_steps_html(detailed_steps)
         
+        # Step 5: Combine all the HTML parts into one complete report.
+
         complete_html = """
         <div style="max-width: 2500px; margin: 0 auto; padding: 20px;">
           #{summary_html}

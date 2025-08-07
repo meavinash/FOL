@@ -5,6 +5,7 @@ defmodule FOLVisualiser.TreeVisualizer do
   Generates HTML/SVG visualization of proof trees with a dark blue color scheme.
   """
 
+  # Alias for FOL formatting utility
   alias FOLVisualiser.FOL
 
   @doc """

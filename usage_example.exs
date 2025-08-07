@@ -16,14 +16,17 @@ modules = [
 ]
 
 Enum.each(modules, fn module_path ->
-  case Code.compile_file(module_path) do
-    {:ok, _} -> IO.puts("✓ Compiled #{module_path}")
-    {:error, reason} -> 
-      IO.puts("✗ Error compiling #{module_path}: #{inspect(reason)}")
+  try do
+    modules_loaded = Code.compile_file(module_path)
+    IO.puts("✓ Compiled #{module_path} (Loaded: #{inspect(Enum.map(modules_loaded, fn {mod, _} -> mod end))})")
+  rescue
+    e ->
+      IO.puts("✗ Error compiling #{module_path}: #{Exception.message(e)}")
       System.halt(1)
   end
 end)
 
+# Import the FOLVisualiser module
 alias FOLVisualiser
 
 IO.puts("\n=== FOL Visualiser Demo ===")
