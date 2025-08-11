@@ -12,8 +12,8 @@ defmodule FOLVisualiser.MixProject do
       name: "FOL Visualiser",
       description: "First-Order Logic Tableau Prover with Visualization",
       package: package(),
-      source_url: ".",
-      homepage_url: "."
+      source_url: "https://github.com/meavinash/FOL.git",
+      homepage_url: "https://github.com/meavinash/FOL.git"
     ]
   end
 
@@ -35,7 +35,7 @@ defmodule FOLVisualiser.MixProject do
   defp package do
     [
       licenses: ["MIT"],
-      links: %{ "GitHub" => "."}
+      links: %{ "GitHub" => "https://github.com/meavinash/FOL.git"}
     ]
   end
 end
